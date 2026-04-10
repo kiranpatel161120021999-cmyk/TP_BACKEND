@@ -1,0 +1,38 @@
+{
+  "timestamp": "2026-03-12T09:28:43.464Z",
+  "collections": [
+    {
+      "name": "companies",
+      "count": 0,
+      "matches": []
+    },
+    {
+      "name": "students",
+      "count": 1,
+      "matches": []
+    },
+    {
+      "name": "users",
+      "count": 0,
+      "matches": []
+    },
+    {
+      "name": "applications",
+      "count": 0,
+      "matches": []
+    },
+    {
+      "name": "admins",
+      "count": 1,
+      "matches": [
+        {
+          "_id": "69b28258842f36b3e7447a16",
+          "name": "Admin",
+          "email": "admin@gmail.com",
+          "password": "admin123",
+          "role": "admin"
+        }
+      ]
+    }
+  ]
+}
