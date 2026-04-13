@@ -7,9 +7,22 @@ const applicationRoutes = require("./routes/applicationRoutes");
 
 const app = express();
 
-// Updated CORS: Allow frontend (port 3000) and include credentials if needed
+// Updated CORS: Allow frontend origins
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://tp-frontend-n04kx2ecx-kiranpatel161120021999-cmyks-projects.vercel.app",
+];
+
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: function (origin, callback) {
+    // allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) === -1) {
+      var msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   credentials: true
 }));
