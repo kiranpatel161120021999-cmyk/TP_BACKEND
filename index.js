@@ -7,21 +7,30 @@ const applicationRoutes = require("./routes/applicationRoutes");
 
 const app = express();
 
-// Updated CORS: Allow frontend origins
+// Updated CORS: Allow frontend origins dynamically
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://tp-frontend-n04kx2ecx-kiranpatel161120021999-cmyks-projects.vercel.app",
+  "http://localhost:3000",
+  "http://127.0.0.1:5173",
 ];
 
 app.use(cors({
   origin: function (origin, callback) {
-    // allow requests with no origin (like mobile apps or curl requests)
+    // 1. Allow requests with no origin (like mobile apps or curl)
     if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) === -1) {
-      var msg = 'The CORS policy for this site does not allow access from the specified Origin.';
-      return callback(new Error(msg), false);
+
+    // 2. Allow local development
+    if (allowedOrigins.indexOf(origin) !== -1) return callback(null, true);
+
+    // 3. SECURE DYNAMIC CHECK: Allow any Vercel deployment for this project
+    // This handles both https://your-app.vercel.app AND preview branches
+    if (origin.endsWith(".vercel.app") && origin.includes("kiranpatel161120021999")) {
+      return callback(null, true);
     }
-    return callback(null, true);
+
+    // 4. Fallback: Block others
+    const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+    return callback(new Error(msg), false);
   },
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   credentials: true

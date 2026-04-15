@@ -6,7 +6,8 @@ const { OAuth2Client } = require("google-auth-library");
 const Student = require("../models/Student");
 const Admin = require("../models/Admin");
 
-const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || "745427042826-5458kcp93m7s7ad90v8rkl2gtuj5sslk.apps.googleusercontent.com";
+const client = new OAuth2Client(GOOGLE_CLIENT_ID);
 const otpStore = new Map(); // Store OTPs as { email: { code, expires } }
 
 // Helper: Send Email
