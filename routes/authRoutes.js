@@ -144,10 +144,10 @@ router.post(["/send-otp", "/send_otp"], async (req, res) => {
         { upsert: true, new: true }
       );
       console.log("✅ OTP saved in DB");
-    } catch (dbErr) {
-      console.error("❌ DB Error:", dbErr);
-      return res.status(500).json({ message: "Database error" });
-    }
+    }catch (dbErr) {
+  console.error("🔥 FULL DB ERROR:", dbErr);
+  return res.status(500).json({ message: dbErr.message });
+}
 
     try {
       const transporter = nodemailer.createTransport({
