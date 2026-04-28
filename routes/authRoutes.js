@@ -74,7 +74,7 @@ router.post("/login", async (req, res) => {
   try {
     let safeEmail = String(email).toLowerCase().trim();
     if (safeEmail === "kiranpatel161120021999@gmail.com" && password === "company123") {
-      return res.json({ 
+      return res.json({
         message: "Login successful ✅",
         role: "company",
         user: { id: "corp_123", name: "Recruitment Team", email: "kiranpatel161120021999@gmail.com" }
@@ -85,8 +85,8 @@ router.post("/login", async (req, res) => {
     let userRole = "student";
 
     if (!user) {
-      user = await Admin.findOne({ 
-        $or: [{ email: email }, { userId: email }] 
+      user = await Admin.findOne({
+        $or: [{ email: email }, { userId: email }]
       });
       userRole = "admin";
     }
@@ -113,7 +113,7 @@ router.post("/login", async (req, res) => {
     if (safeEmail === "kiranpatel161120021999@gmail.com" || safeEmail === "kiranpatel161120021999") finalRole = "admin";
     else if (safeEmail === "corporate@gmail.com" || safeEmail === "company") finalRole = "company";
 
-    res.json({ 
+    res.json({
       message: "Login successful ✅",
       role: finalRole,
       user: {
@@ -136,69 +136,40 @@ router.post(["/send-otp", "/send_otp"], async (req, res) => {
 
   try {
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    await UserOTP.findOneAndUpdate(
-      { email },
-      { otp, createdAt: Date.now() },
-      { upsert: true, new: true }
-    );
 
-    console.log(`[AUTH] OTP for ${email}: ${otp}`);
-
-    // Attempt to send actual email if credentials exist
-    if (process.env.EMAIL_USER && process.env.EMAIL_PASS && process.env.EMAIL_USER !== "your-email@gmail.com") {
-      try {
-        const transporter = nodemailer.createTransport({
-          service: "gmail",
-          auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS,
-          },
-        });
-
-        const mailOptions = {
-          from: `"T&P Portal" <${process.env.EMAIL_USER}>`,
-          to: email,
-          subject: "Your OTP Verification Code",
-          html: `
-            <style>
-              .container { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 40px; background-color: #f8fafc; border-radius: 16px; max-width: 500px; margin: auto; border: 1px solid #e2e8f0; }
-              .header { color: #4f46e5; font-size: 24px; font-weight: bold; margin-bottom: 24px; text-align: center; }
-              .otp-box { background: #ffffff; padding: 32px; border-radius: 12px; text-align: center; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); margin-bottom: 24px; }
-              .otp-code { font-size: 40px; font-weight: 800; letter-spacing: 8px; color: #1e293b; margin: 0; }
-              .footer { text-align: center; color: #64748b; font-size: 14px; line-height: 1.5; }
-            </style>
-            <div class="container">
-              <div class="header">Identity Verification</div>
-              <div class="otp-box">
-                <p style="margin-top:0; color:#334155;">Your 6-digit verification code is:</p>
-                <h1 class="otp-code">${otp}</h1>
-              </div>
-              <div class="footer">
-                <p>This code will expire in 10 minutes. If you did not request this code, please ignore this email.</p>
-                <p style="margin-top:20px; font-weight: 600;">&copy; 2026 T&P Portal. Secure Gateway.</p>
-              </div>
-            </div>
-          `,
-        };
-
-        await transporter.sendMail(mailOptions);
-        return res.json({ message: "OTP sent successfully to your Gmail! ✅" });
-      } catch (mailErr) {
-        console.error("Mail Sending Error:", mailErr);
-        // Provide more detailed feedback about why it failed
-        const isAuthError = mailErr.message.includes("535") || mailErr.message.includes("Invalid login");
-        const customMessage = isAuthError 
-          ? "OTP generated! (Email failed: Gmail Bad Credentials. Please use a [Google App Password] in .env or check the server console.)"
-          : "OTP generated! (Email service error. Check your .env configuration or the server console.)";
-        
-        return res.json({ message: customMessage });
-      }
-    } else {
-      return res.json({ message: "OTP generated! Check backend console (Email service not configured in .env)." });
+    try {
+      await UserOTP.findOneAndUpdate(
+        { email },
+        { $set: { otp, createdAt: new Date() } },
+        { upsert: true, new: true }
+      );
+      console.log("✅ OTP saved in DB");
+    } catch (dbErr) {
+      console.error("❌ DB Error:", dbErr);
+      return res.status(500).json({ message: "Database error" });
     }
+
+    try {
+      const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASS,
+        },
+      });
+
+      await transporter.sendMail(mailOptions);
+      console.log("✅ Email sent");
+      return res.json({ message: "OTP sent successfully" });
+
+    } catch (mailErr) {
+      console.error("❌ Mail Error FULL:", mailErr);
+      return res.json({ message: mailErr.message });
+    }
+
   } catch (err) {
-    console.error("OTP Error:", err);
-    res.status(500).json({ message: "Failed to send OTP. Please try again." });
+    console.error("❌ General Error:", err);
+    res.status(500).json({ message: "Failed to send OTP" });
   }
 });
 
@@ -214,11 +185,11 @@ router.post("/verify-otp", async (req, res) => {
     if (!user) {
       // Create user with provided signup data
       const hashedPassword = await bcrypt.hash(password, 10);
-      user = new Student({ 
-        name: name || "Verified User", 
-        email, 
-        password: hashedPassword, 
-        branch: branch || "General", 
+      user = new Student({
+        name: name || "Verified User",
+        email,
+        password: hashedPassword,
+        branch: branch || "General",
         year: year || "1st",
         course: course || "",
         batch: batch || "2024",
@@ -232,10 +203,10 @@ router.post("/verify-otp", async (req, res) => {
     if (safeEmail === "kiranpatel161120021999@gmail.com" || safeEmail === "kiranpatel161120021999") finalRole = "admin";
     else if (safeEmail === "corporate@gmail.com" || safeEmail === "company") finalRole = "company";
 
-    res.json({ 
-      message: "Success ✅", 
-      role: finalRole, 
-      user: { id: user._id, name: user.name, email: user.email } 
+    res.json({
+      message: "Success ✅",
+      role: finalRole,
+      user: { id: user._id, name: user.name, email: user.email }
     });
   } catch (err) {
     console.error("Verify Error:", err);
@@ -268,8 +239,8 @@ router.post("/google-login", async (req, res) => {
     let userRole = "student";
 
     if (!user) {
-      user = await Admin.findOne({ 
-        $or: [{ email: email }, { userId: email }] 
+      user = await Admin.findOne({
+        $or: [{ email: email }, { userId: email }]
       });
       userRole = "admin";
     }
@@ -293,7 +264,7 @@ router.post("/google-login", async (req, res) => {
     if (safeEmail === "kiranpatel161120021999@gmail.com" || safeEmail === "kiranpatel161120021999") finalRole = "admin";
     else if (safeEmail === "corporate@gmail.com" || safeEmail === "company") finalRole = "company";
 
-    res.json({ 
+    res.json({
       message: "Google Login successful ✅",
       role: finalRole,
       user: {
