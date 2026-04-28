@@ -32,6 +32,16 @@ router.post("/applyjob", upload.single("resume"), async (req, res) => {
   }
 });
 
+// Get all applications (Admin)
+router.get("/", async (req, res) => {
+  try {
+    const apps = await Application.find();
+    res.json(apps);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Get applications by email
 router.get("/user/:email", async (req, res) => {
   try {

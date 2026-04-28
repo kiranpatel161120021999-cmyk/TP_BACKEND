@@ -5,7 +5,13 @@ const jobSchema = new mongoose.Schema({
   title: String,
   salary: String,
   eligibility: String,
-  deadline: Date
+  deadline: Date,
+  skills: String,
+  location: String,
+  jobType: String,
+  postedDate: Date,
+  description: String,
+  image: String
 });
 
 module.exports = mongoose.model("Job", jobSchema);

@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 async function checkDB() {
   try {
-    await mongoose.connect("mongodb://127.0.0.1:27017/react_collage");
+    await mongoose.connect("mongodb://localhost:27017/trainingDB");
     console.log("Connected to MongoDB");
 
     const collections = await mongoose.connection.db.listCollections().toArray();

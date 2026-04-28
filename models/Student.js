@@ -2,6 +2,8 @@ const mongoose = require("mongoose");
 
 const studentSchema = new mongoose.Schema({
   name: String,
+  firstName: String,
+  lastName: String,
   email: String,
   password: String,
   branch: String,
@@ -9,12 +11,18 @@ const studentSchema = new mongoose.Schema({
   course: String,
   batch: String,
   con_no: String,
+  mobile: String,
   dob: Date,
   gender: String,
   cgpa: Number,
   skills: [String],
   bio: String,
   location: String,
+  addressLine1: String,
+  addressLine2: String,
+  city: String,
+  state: String,
+  country: String,
   education: [{
     degree: String,
     school: String,
@@ -27,8 +35,9 @@ const studentSchema = new mongoose.Schema({
     duration: String,
     description: String
   }],
-  enrolledTrainings: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Training' }],
-  placed: { type: Boolean, default: false }
+  placed: { type: Boolean, default: false },
+  googleId: String,
+  avatar: String
 });
 
 module.exports = mongoose.model("Student", studentSchema);
