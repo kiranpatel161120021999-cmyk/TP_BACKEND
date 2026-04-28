@@ -7,7 +7,6 @@ const UserOTP = require("../models/UserOTP");
 const nodemailer = require("nodemailer");
 const { OAuth2Client } = require("google-auth-library");
 
-<<<<<<< HEAD
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || "745427042826-5458kcp93m7s7ad90v8rkl2gtuj5sslk.apps.googleusercontent.com";
 const client = new OAuth2Client(GOOGLE_CLIENT_ID);
 const otpStore = new Map(); // Store OTPs as { email: { code, expires } }
@@ -38,15 +37,6 @@ const sendOTPEmail = async (email, code) => {
   };
 
   await transporter.sendMail(mailOptions);
-=======
-// Google OAuth2 initialization
-let googleClient;
-const getGoogleClient = () => {
-  if (!googleClient) {
-    googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-  }
-  return googleClient;
->>>>>>> d42a039 (update backend)
 };
 
 // ===== SIGNUP =====
